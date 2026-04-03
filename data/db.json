@@ -1,0 +1,205 @@
+{
+  "buses": [
+    {
+      "id": "1",
+      "name": "KPN Travels",
+      "type": "AC Sleeper",
+      "from": "Chennai",
+      "to": "Coimbatore",
+      "date": "2026-03-31",
+      "departure": "21:00",
+      "arrival": "05:00",
+      "price": 650,
+      "totalSeats": 40,
+      "bookedSeats": [
+        2,
+        5,
+        10,
+        15,
+        20,
+        33
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "2",
+      "name": "SRS Travels",
+      "type": "AC Seater",
+      "from": "Chennai",
+      "to": "Coimbatore",
+      "date": "2026-03-31",
+      "departure": "22:30",
+      "arrival": "06:30",
+      "price": 450,
+      "totalSeats": 40,
+      "bookedSeats": [
+        1,
+        7,
+        14,
+        21,
+        28
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Parveen Travels",
+      "type": "Non-AC Seater",
+      "from": "Chennai",
+      "to": "Coimbatore",
+      "date": "2026-03-31",
+      "departure": "20:00",
+      "arrival": "04:30",
+      "price": 300,
+      "totalSeats": 40,
+      "bookedSeats": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Orange Travels",
+      "type": "AC Sleeper",
+      "from": "Chennai",
+      "to": "Bangalore",
+      "date": "2026-03-31",
+      "departure": "22:00",
+      "arrival": "05:30",
+      "price": 750,
+      "totalSeats": 40,
+      "bookedSeats": [
+        4,
+        8,
+        16,
+        24
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "5",
+      "name": "VRL Travels",
+      "type": "Non-AC Sleeper",
+      "from": "Bangalore",
+      "to": "Chennai",
+      "date": "2026-03-31",
+      "departure": "19:00",
+      "arrival": "03:00",
+      "price": 400,
+      "totalSeats": 40,
+      "bookedSeats": [
+        5,
+        11,
+        17,
+        22
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "6",
+      "name": "KPN Travels",
+      "type": "AC Sleeper",
+      "from": "Chennai",
+      "to": "Coimbatore",
+      "date": "2026-04-01",
+      "departure": "21:00",
+      "arrival": "05:00",
+      "price": 650,
+      "totalSeats": 40,
+      "bookedSeats": [
+        3,
+        8
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "7",
+      "name": "SRS Travels",
+      "type": "AC Seater",
+      "from": "Chennai",
+      "to": "Coimbatore",
+      "date": "2026-04-01",
+      "departure": "22:30",
+      "arrival": "06:30",
+      "price": 450,
+      "totalSeats": 40,
+      "bookedSeats": [
+        2,
+        9
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "8",
+      "name": "Orange Travels",
+      "type": "AC Sleeper",
+      "from": "Chennai",
+      "to": "Bangalore",
+      "date": "2026-04-01",
+      "departure": "22:00",
+      "arrival": "05:30",
+      "price": 750,
+      "totalSeats": 40,
+      "bookedSeats": [
+        1,
+        6
+      ],
+      "womenSeats": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "users": [
+    {
+      "name": "Veera Vignesh",
+      "age": "21",
+      "email": "veeravignesh72@gmail.com",
+      "contact": "8838733196",
+      "password": "123456",
+      "id": "4Gry4X5g88o"
+    }
+  ],
+  "bookings": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
