@@ -1,6 +1,7 @@
 export default function SeatLayout({ totalSeats, bookedSeats, womenSeats, selected, onSelect }) {
 
   function getSeatClass(num) {
+    // ✅ Check booked FIRST — a booked seat must never appear selected or available
     if (bookedSeats.includes(num)) return "seat seat-booked";
     if (selected.includes(num))    return "seat seat-sel";
     if (womenSeats.includes(num))  return "seat seat-women";
@@ -16,7 +17,6 @@ export default function SeatLayout({ totalSeats, bookedSeats, womenSeats, select
     }
   }
 
-  // Build rows: each row has 4 seats → displayed as [A][B] | gap | [C][D]
   const rows = [];
   for (let i = 1; i <= totalSeats; i += 4) {
     rows.push([i, i + 1, i + 2, i + 3].filter((n) => n <= totalSeats));
@@ -32,15 +32,12 @@ export default function SeatLayout({ totalSeats, bookedSeats, womenSeats, select
         <div className="legend-item"><div className="legend-box women"></div>Women</div>
       </div>
 
-      {/* Bus front indicator */}
       <div style={{ color: "var(--muted)", fontSize: "0.82rem", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: "1.3rem" }}>🚌</span> Front · Driver Side
       </div>
 
-      {/* Seat rows */}
       {rows.map((row, ri) => (
         <div className="seat-row" key={ri}>
-          {/* Left 2 seats */}
           {[row[0], row[1]].map((num) =>
             num ? (
               <button
@@ -55,10 +52,8 @@ export default function SeatLayout({ totalSeats, bookedSeats, womenSeats, select
             ) : <div key={"el" + ri} />
           )}
 
-          {/* Aisle gap */}
           <div className="seat-aisle"></div>
 
-          {/* Right 2 seats */}
           {[row[2], row[3]].map((num) =>
             num ? (
               <button

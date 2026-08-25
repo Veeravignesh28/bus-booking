@@ -139,3 +139,327 @@ a.secondary {
     --button-secondary-border: #1a1a1a;
   }
 }
+/* ═══════════════════════════════════════════════
+   Home.module.css  –  Hero section styles
+   ═══════════════════════════════════════════════ */
+
+/* ── Hero Layout ── */
+.hero {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 64px);
+  padding: 3rem 2rem;
+  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.heroLeft {
+  flex: 1 1 50%;
+  max-width: 580px;
+}
+
+/* ── Right panel ── */
+.heroRight {
+  flex: 1 1 45%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  background: linear-gradient(160deg, #eff6ff 0%, #dbeafe 60%, #bfdbfe 100%);
+  border-radius: 28px;
+  overflow: hidden;
+  padding: 2rem 1.5rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
+}
+
+/* ── Scenery ── */
+.scenery {
+  position: absolute;
+  inset: 0;
+}
+
+/* Sun */
+.sun {
+  position: absolute;
+  top: 22px;
+  right: 40px;
+  width: 54px;
+  height: 54px;
+  background: radial-gradient(circle, #fde68a 40%, #fcd34d 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px 10px rgba(252, 211, 77, 0.35);
+  animation: pulseSun 3s ease-in-out infinite;
+}
+
+@keyframes pulseSun {
+  0%,
+  100% {
+    box-shadow: 0 0 30px 10px rgba(252, 211, 77, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 44px 16px rgba(252, 211, 77, 0.5);
+  }
+}
+
+/* Clouds */
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50px;
+  opacity: 0.85;
+}
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud1 {
+  top: 30px;
+  left: 30px;
+  width: 80px;
+  height: 22px;
+  animation: drift 12s linear infinite;
+}
+.cloud1::before {
+  width: 34px;
+  height: 34px;
+  top: -18px;
+  left: 12px;
+}
+.cloud1::after {
+  width: 24px;
+  height: 24px;
+  top: -12px;
+  left: 38px;
+}
+
+.cloud2 {
+  top: 55px;
+  left: 140px;
+  width: 56px;
+  height: 16px;
+  animation: drift 18s linear infinite 4s;
+}
+.cloud2::before {
+  width: 24px;
+  height: 24px;
+  top: -13px;
+  left: 8px;
+}
+.cloud2::after {
+  width: 18px;
+  height: 18px;
+  top: -9px;
+  left: 26px;
+}
+
+@keyframes drift {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(18px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Trees */
+.tree {
+  position: absolute;
+  font-size: 2rem;
+  bottom: 78px;
+  animation: sway 4s ease-in-out infinite;
+}
+.tree1 {
+  left: 18px;
+  font-size: 2.2rem;
+  animation-delay: 0s;
+}
+.tree2 {
+  left: 56px;
+  font-size: 1.6rem;
+  animation-delay: 1s;
+}
+.tree3 {
+  right: 22px;
+  font-size: 2rem;
+  animation-delay: 0.5s;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+/* ── Road ── */
+.road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: #334155;
+  border-radius: 0 0 28px 28px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.road::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #fde68a;
+}
+
+.roadLine {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  width: 60px;
+  background: white;
+  border-radius: 2px;
+  animation: roadScroll 1.4s linear infinite;
+}
+.roadLine:nth-child(1) {
+  left: 10%;
+  animation-delay: 0s;
+}
+.roadLine:nth-child(2) {
+  left: 45%;
+  animation-delay: -0.47s;
+}
+.roadLine:nth-child(3) {
+  left: 78%;
+  animation-delay: -0.94s;
+}
+
+@keyframes roadScroll {
+  0% {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50%) translateX(-120px);
+    opacity: 0.4;
+  }
+}
+
+/* ── Bus ── */
+.busWrapper {
+  position: relative;
+  z-index: 2;
+  margin-top: 1rem;
+  animation: busFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes busFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.busSvg {
+  width: 100%;
+  max-width: 340px;
+  filter: drop-shadow(0 12px 24px rgba(37, 99, 235, 0.28));
+}
+
+/* Speed lines */
+.speedLines {
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.speedLines span {
+  display: block;
+  height: 3px;
+  background: linear-gradient(to left, #93c5fd, transparent);
+  border-radius: 2px;
+  animation: speed 1s ease-in-out infinite;
+}
+.speedLines span:nth-child(1) {
+  width: 40px;
+  animation-delay: 0s;
+}
+.speedLines span:nth-child(2) {
+  width: 28px;
+  animation-delay: 0.15s;
+}
+.speedLines span:nth-child(3) {
+  width: 36px;
+  animation-delay: 0.3s;
+}
+.speedLines span:nth-child(4) {
+  width: 20px;
+  animation-delay: 0.45s;
+}
+
+@keyframes speed {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.2);
+  }
+}
+
+/* ── Badge ── */
+.busBadge {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2563eb;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  letter-spacing: 0.02em;
+  z-index: 3;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    padding: 2rem 1rem;
+  }
+  .heroLeft {
+    max-width: 100%;
+  }
+  .heroRight {
+    width: 100%;
+    min-height: 280px;
+  }
+}

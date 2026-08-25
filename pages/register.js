@@ -1,6 +1,15 @@
+// pages/register.js
+// ------------------
+// Create a new account page.
+// CSS classes used (from globals.css):
+//   .auth-wrap, .auth-card, .auth-sub, .auth-footer,
+//   .form-group, .form-row, .alert, .alert-error, .alert-success,
+//   .btn, .btn-primary, .btn-full, .btn-lg
+
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
+import { fetchApi } from "../utils/api";
 
 export default function Register() {
   const router = useRouter();
@@ -13,12 +22,14 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [success, setSuccess]   = useState("");
+  const [loading, setLoading]   = useState(false);
 
   async function handleRegister(e) {
-    e.preventDefault();
+    e.preventDefault(); // stop form page refresh
     setError("");
     setSuccess("");
 
+    // Basic client-side validation
     if (!name || !age || !email || !contact || !password) {
       setError("All fields are required.");
       return;
@@ -28,44 +39,54 @@ export default function Register() {
       return;
     }
 
-    // Check if email already exists
-    const checkRes  = await fetch("http://localhost:3001/users");
-    const allUsers  = await checkRes.json();
-    const existing  = allUsers.find((u) => u.email === email);
-    if (existing) {
-      setError("Email already registered. Please login.");
-      return;
+    setLoading(true);
+
+    try {
+      // ✅ POST to our own Spring Boot API route
+      const data = await fetchApi("/api/auth/register", {
+        method:  "POST",
+        body:    JSON.stringify({ name, age, email, contact, password }),
+      });
+
+      // Auto-login: save the new user to localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("loggedUser", JSON.stringify(data.user));
+      setSuccess("Account created! Redirecting...");
+
+      // Redirect after 1 second
+      setTimeout(() => {
+        router.push(redirect ? `/${redirect}` : "/");
+      }, 1000);
+
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    // POST new user to json-server
-    const newUser = { name, age, email, contact, password };
-    const res = await fetch("http://localhost:3001/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newUser),
-    });
-    const created = await res.json();
-
-    // Auto login after register
-    localStorage.setItem("loggedUser", JSON.stringify(created));
-    setSuccess("Account created! Redirecting...");
-    setTimeout(() => {
-      router.push(redirect ? `/${redirect}` : "/");
-    }, 1000);
   }
 
   return (
     <>
       <Navbar />
+
+      {/* .auth-wrap → full-height flex center */}
       <div className="auth-wrap">
+
+        {/* .auth-card → card, max-width 430px */}
         <div className="auth-card card">
           <h2>Create Account 🚌</h2>
+
+          {/* .auth-sub → small grey subtitle */}
           <p className="auth-sub">Join BusGo and start booking tickets</p>
 
+          {/* Alert messages */}
           {error   && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
 
           <form onSubmit={handleRegister}>
+
+            {/* Full name */}
             <div className="form-group">
               <label>Full Name</label>
               <input
@@ -76,6 +97,7 @@ export default function Register() {
               />
             </div>
 
+            {/* Age + Contact side by side using .form-row (2-column grid) */}
             <div className="form-row">
               <div className="form-group">
                 <label>Age</label>
@@ -121,14 +143,21 @@ export default function Register() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary btn-full btn-lg" style={{ marginTop: 6 }}>
-              Create Account
+            <button
+              type="submit"
+              className="btn btn-primary btn-full btn-lg"
+              style={{ marginTop: 6 }}
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
           <div className="auth-footer">
             Already have an account?{" "}
-            <a href={`/login${redirect ? `?redirect=${redirect}` : ""}`}>Login here</a>
+            <a href={`/login${redirect ? `?redirect=${redirect}` : ""}`}>
+              Login here
+            </a>
           </div>
         </div>
       </div>

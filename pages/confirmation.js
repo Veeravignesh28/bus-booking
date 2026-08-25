@@ -1,164 +1,170 @@
-import { useState, useEffect } from "react";
+// pages/confirmation.js
+// ----------------------
+// Booking confirmed! Shows a styled ticket after payment.
+// Reads booking data from sessionStorage (saved by payment.js).
+// CSS classes come from styles/globals.css:
+//   .confirm-wrap, .confirm-top, .success-ring,
+//   .ticket-card, .ticket-head, .ticket-body,
+//   .ticket-journey, .ticket-divider, .confirm-actions
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 
-const METHODS = [
-  { id: "upi",        icon: "📱", name: "UPI",                   desc: "GPay, PhonePe, Paytm" },
-  { id: "card",       icon: "💳", name: "Credit / Debit Card",   desc: "Visa, Mastercard, RuPay" },
-  { id: "netbanking", icon: "🏦", name: "Net Banking",           desc: "All major banks supported" },
-];
-
-export default function Payment() {
+export default function Confirmation() {
   const router = useRouter();
+  const [booking, setBooking] = useState(null);
 
-  const [bus, setBus]           = useState(null);
-  const [booking, setBooking]   = useState(null);
-  const [passenger, setPassenger] = useState(null);
-  const [method, setMethod]     = useState("upi");
-  const [loading, setLoading]   = useState(false);
-
+  // On page load: read the saved booking from sessionStorage
   useEffect(() => {
-    const user      = localStorage.getItem("loggedUser");
-    const pending   = sessionStorage.getItem("pendingBooking");
-    const pdetails  = sessionStorage.getItem("passengerDetails");
+    const data = sessionStorage.getItem("confirmation");
 
-    if (!user || !pending || !pdetails) { router.push("/"); return; }
-
-    const parsed = JSON.parse(pending);
-    setBooking(parsed);
-    setPassenger(JSON.parse(pdetails));
-
-    async function fetchBus() {
-      const res  = await fetch(`http://localhost:3001/buses/${parsed.busId}`);
-      const data = await res.json();
-      setBus(data);
+    if (!data) {
+      // Nothing saved — user probably refreshed or landed here directly
+      router.push("/");
+      return;
     }
-    fetchBus();
+
+    setBooking(JSON.parse(data));
   }, []);
 
-  async function handlePay() {
-    setLoading(true);
-
-    // Simulate payment delay
-    await new Promise((r) => setTimeout(r, 1600));
-
-    const bookingId = "BG" + Date.now().toString().slice(-8).toUpperCase();
-    const user      = JSON.parse(localStorage.getItem("loggedUser"));
-    const total     = booking.seats.length * bus.price;
-
-    // Save booking to json-server (CRUD - CREATE)
-    const newBooking = {
-      bookingId,
-      userId:    user.id,
-      busId:     bus.id,
-      busName:   bus.name,
-      from:      bus.from,
-      to:        bus.to,
-      date:      bus.date,
-      departure: bus.departure,
-      arrival:   bus.arrival,
-      seats:     booking.seats,
-      passenger,
-      paymentMethod: method,
-      total,
-      bookedAt:  new Date().toISOString(),
-    };
-
-    await fetch("http://localhost:3001/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newBooking),
-    });
-
-    // Update bus bookedSeats in json-server (CRUD - UPDATE)
-    const updatedSeats = [...bus.bookedSeats, ...booking.seats];
-    await fetch(`http://localhost:3001/buses/${bus.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookedSeats: updatedSeats }),
-    });
-
-    // Save confirmation to sessionStorage and navigate
-    sessionStorage.setItem("confirmation", JSON.stringify(newBooking));
-    sessionStorage.removeItem("pendingBooking");
-    sessionStorage.removeItem("passengerDetails");
-    router.push("/confirmation");
+  // Loading state while sessionStorage is being read
+  if (!booking) {
+    return (
+      <>
+        <Navbar />
+        <div className="container" style={{ padding: "40px 20px", textAlign: "center" }}>
+          <p style={{ color: "var(--muted)" }}>Loading confirmation...</p>
+        </div>
+      </>
+    );
   }
-
-  if (!bus || !booking || !passenger) return null;
-  const total = booking.seats.length * bus.price;
 
   return (
     <>
       <Navbar />
-      <div className="container" style={{ padding: "28px 20px", maxWidth: 800 }}>
 
-        <div className="page-title">
-          <h2>Payment</h2>
-          <p>Step 2 of 2 — Complete your booking</p>
+      {/* .confirm-wrap → max-width 620px centered container */}
+      <div className="confirm-wrap">
+
+        {/* ── Top: green ring + title ── */}
+        {/* .confirm-top → text-align center */}
+        <div className="confirm-top">
+          {/* .success-ring → green circle with emoji */}
+          {/*<div className="success-ring">🎉</div>*/}
+          <h2>Booking Confirmed!</h2>
+          <p>Your ticket has been booked. Have a safe journey!</p>
         </div>
 
-        <div className="payment-grid">
-          {/* Left: payment methods */}
-          <div>
-            <div className="card">
-              <h3 style={{ fontSize: "0.95rem", marginBottom: 16 }}>Choose Payment Method</h3>
+        {/* ── Ticket card ── */}
+        {/* .ticket-card → white card with border-radius 18px */}
+        <div className="ticket-card">
 
-              <div className="pay-methods">
-                {METHODS.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`pay-option ${method === m.id ? "active" : ""}`}
-                    onClick={() => setMethod(m.id)}
-                  >
-                    <span className="pay-icon">{m.icon}</span>
-                    <div>
-                      <div className="pay-name">{m.name}</div>
-                      <div className="pay-desc">{m.desc}</div>
-                    </div>
-                    <div className="pay-radio"></div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="pay-notice">
-                ⚠️ This is a simulated payment for demo. No real transaction occurs.
-              </div>
-
-              <button
-                className="btn btn-primary btn-full btn-lg"
-                onClick={handlePay}
-                disabled={loading}
-              >
-                {loading ? "⏳ Processing..." : `Pay ₹${total}`}
-              </button>
+          {/* Orange gradient header */}
+          {/* .ticket-head → orange gradient background */}
+          <div className="ticket-head">
+            <div className="t-id">BOOKING ID</div>
+            <h3>{booking.bookingId}</h3>
+            <div className="t-route">
+              {booking.busName} · {booking.from} → {booking.to}
             </div>
           </div>
 
-          {/* Right: order summary */}
-          <div>
-            <div className="card sidebar-card">
-              <h3 style={{ fontSize: "0.95rem", marginBottom: 14 }}>Order Summary</h3>
-              <div className="info-row"><span className="key">Bus</span><span className="val">{bus.name}</span></div>
-              <div className="info-row"><span className="key">Route</span><span className="val">{bus.from} → {bus.to}</span></div>
-              <div className="info-row"><span className="key">Date</span><span className="val">{bus.date}</span></div>
-              <div className="info-row"><span className="key">Departure</span><span className="val">{bus.departure}</span></div>
-              <div className="info-row">
-                <span className="key">Seats</span>
-                <span className="val" style={{ color: "var(--orange)" }}>
-                  {[...booking.seats].sort((a, b) => a - b).join(", ")}
-                </span>
+          {/* White body with all details */}
+          {/* .ticket-body → padding 22px 26px */}
+          <div className="ticket-body">
+
+            {/* Departure & Arrival times side by side */}
+            {/* .ticket-journey → 2-column grid */}
+            <div className="ticket-journey">
+              <div>
+                {/* .tj-label → small uppercase grey label */}
+                <div className="tj-label">Departure</div>
+                {/* .tj-time → large bold time */}
+                <div className="tj-time">{booking.departure}</div>
+                {/* .tj-city → small grey city name */}
+                <div className="tj-city">{booking.from}</div>
               </div>
-              <div className="info-row"><span className="key">Passenger</span><span className="val">{passenger.name}</span></div>
-              <div className="info-row"><span className="key">Price/seat</span><span className="val">₹{bus.price}</span></div>
-              <div className="info-row"><span className="key">× Seats</span><span className="val">{booking.seats.length}</span></div>
-              <div className="total-row">
-                <span>Total</span>
-                <span className="val">₹{total}</span>
+              <div style={{ textAlign: "right" }}>
+                <div className="tj-label">Arrival</div>
+                <div className="tj-time">{booking.arrival}</div>
+                <div className="tj-city">{booking.to}</div>
               </div>
             </div>
+
+            {/* Horizontal divider line */}
+            {/* .ticket-divider → 1px border line */}
+            <div className="ticket-divider"></div>
+
+            {/* Booking info rows */}
+            {/* .info-row → flex row with key on left, value on right */}
+            <div className="info-row">
+              <span className="key">Date</span>
+              <span className="val">{booking.date}</span>
+            </div>
+
+            <div className="info-row">
+              <span className="key">Seats</span>
+              {/* Sort seats numerically before displaying */}
+              <span className="val" style={{ color: "var(--orange)" }}>
+                {[...booking.seats].sort((a, b) => a - b).join(", ")}
+              </span>
+            </div>
+
+            <div className="info-row">
+              <span className="key">Passenger</span>
+              <span className="val">{booking.passenger.name}</span>
+            </div>
+
+            <div className="info-row">
+              <span className="key">Contact</span>
+              <span className="val">{booking.passenger.contact}</span>
+            </div>
+
+            <div className="info-row">
+              <span className="key">Gender</span>
+              <span className="val">{booking.passenger.gender}</span>
+            </div>
+
+            <div className="info-row">
+              <span className="key">Payment Method</span>
+              <span className="val" style={{ textTransform: "uppercase" }}>
+                {booking.paymentMethod}
+              </span>
+            </div>
+
+            {/* Total at bottom */}
+            {/* .total-row → bold flex row with orange amount */}
+            <div className="total-row">
+              <span>Amount Paid</span>
+              <span className="val">₹{booking.total}</span>
+            </div>
+
           </div>
         </div>
+
+        {/* ── Buttons: Print + Book Again ── */}
+        {/* .confirm-actions → flex row, each button takes equal space */}
+        <div className="confirm-actions">
+          <button
+            className="btn btn-outline"
+            onClick={() => window.print()}
+          >
+            🖨️ Print Ticket
+          </button>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              // Clear confirmation from session so next booking starts fresh
+              sessionStorage.removeItem("confirmation");
+              router.push("/");
+            }}
+          >
+          Go to Home
+          </button>
+        </div>
+
       </div>
     </>
   );

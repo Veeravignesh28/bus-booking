@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { fetchApi } from "../utils/api";
 
 export default function Passenger() {
   const router = useRouter();
 
-  const [bus, setBus]           = useState(null);
-  const [booking, setBooking]   = useState(null);
-  const [name, setName]         = useState("");
-  const [email, setEmail]       = useState("");
-  const [contact, setContact]   = useState("");
-  const [gender, setGender]     = useState("");
-  const [error, setError]       = useState("");
+  const [bus, setBus]         = useState(null);
+  const [booking, setBooking] = useState(null);
+  const [name, setName]       = useState("");
+  const [email, setEmail]     = useState("");
+  const [contact, setContact] = useState("");
+  const [gender, setGender]   = useState("");
+  const [error, setError]     = useState("");
 
   useEffect(() => {
-    // Must be logged in
-    const stored = localStorage.getItem("loggedUser");
+    const stored  = localStorage.getItem("loggedUser");
     if (!stored) { router.push("/login?redirect=passenger"); return; }
 
-    // Must have a pending booking
     const pending = sessionStorage.getItem("pendingBooking");
     if (!pending) { router.push("/"); return; }
 
@@ -31,13 +31,24 @@ export default function Passenger() {
     setEmail(user.email || "");
     setContact(user.contact || "");
 
-    // Fetch bus details
-    async function fetchBus() {
-      const res  = await fetch(`http://localhost:3001/buses/${parsed.busId}`);
-      const data = await res.json();
-      setBus(data);
+    // ✅ Read bus from sessionStorage (saved by seat-selection page)
+    const busData = sessionStorage.getItem("selectedBus");
+    if (busData) {
+      setBus(JSON.parse(busData));
+    } else {
+      // Fallback: fetch from Next.js API route using stored from/to/date
+      async function fetchBus() {
+        try {
+          const { date } = parsed;
+          const found = await fetchApi(`/api/buses/${parsed.busId}?date=${date}`);
+          if (found) setBus(found);
+          else router.push("/");
+        } catch {
+          router.push("/");
+        }
+      }
+      fetchBus();
     }
-    fetchBus();
   }, []);
 
   function handleSubmit(e) {
@@ -51,7 +62,18 @@ export default function Passenger() {
     router.push("/payment");
   }
 
-  if (!bus || !booking) return null;
+  // ✅ Guard before any calculation
+  if (!bus || !booking) {
+    return (
+      <>
+        <Navbar />
+        <div className="container" style={{ padding: "40px 20px", textAlign: "center" }}>
+          <p style={{ color: "var(--muted)" }}>Loading details...</p>
+        </div>
+      </>
+    );
+  }
+
   const total = booking.seats.length * bus.price;
 
   return (
@@ -138,6 +160,7 @@ export default function Passenger() {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 }

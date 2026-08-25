@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
-const CITIES = ["Chennai", "Coimbatore", "Bangalore", "Madurai", "Salem", "Trichy"];
+const CITIES = ["Chennai", "Coimbatore", "Tirunelveli","Bangalore", "Madurai", "Salem", "Trichy"];
 
 export default function Home() {
   const router = useRouter();
+
   const today = new Date().toISOString().split("T")[0];
 
   const [from, setFrom]   = useState("");
@@ -43,7 +45,6 @@ export default function Home() {
 
             <form onSubmit={handleSearch}>
               <div className="search-grid">
-                {/* From */}
                 <div className="form-group">
                   <label>From</label>
                   <select value={from} onChange={(e) => setFrom(e.target.value)}>
@@ -52,7 +53,6 @@ export default function Home() {
                   </select>
                 </div>
 
-                {/* To */}
                 <div className="form-group">
                   <label>To</label>
                   <select value={to} onChange={(e) => setTo(e.target.value)}>
@@ -61,13 +61,16 @@ export default function Home() {
                   </select>
                 </div>
 
-                {/* Date */}
                 <div className="form-group">
                   <label>Travel Date</label>
-                  <input type="date" value={date} min={today} onChange={(e) => setDate(e.target.value)} />
+                  <input
+                    type="date"
+                    value={date}
+                    min={today}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
                 </div>
 
-                {/* Search button */}
                 <button type="submit" className="btn btn-primary btn-lg">
                   Search
                 </button>
@@ -75,7 +78,6 @@ export default function Home() {
             </form>
           </div>
 
-          {/* Stats row */}
           <div className="hero-stats">
             <div className="hero-stat"><strong>500+</strong>Routes</div>
             <div className="hero-stat"><strong>50+</strong>Operators</div>
@@ -83,6 +85,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

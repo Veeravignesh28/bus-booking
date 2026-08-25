@@ -2,28 +2,33 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../../components/Navbar";
 import SeatLayout from "../../components/SeatLayout";
+import Footer from "../../components/Footer";
+import { fetchApi } from "../../utils/api";
 
 export default function SeatPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, from, to, date } = router.query;
 
-  const [bus, setBus]         = useState(null);
+  const [bus, setBus]           = useState(null);
   const [selected, setSelected] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]   = useState(true);
 
-  // Fetch bus details from json-server
   useEffect(() => {
-    if (!id) return;
+    if (!id || !from || !to || !date) return;
 
     async function fetchBus() {
-      const res  = await fetch(`http://localhost:3001/buses/${id}`);
-      const data = await res.json();
-      setBus(data);
-      setLoading(false);
+      try {
+        const found = await fetchApi(`/api/buses/${id}?date=${date}`);
+        if (found) setBus(found);
+      } catch (err) {
+        console.error("Failed to fetch bus:", err);
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchBus();
-  }, [id]);
+  }, [id, from, to, date]);
 
   function handleProceed() {
     if (selected.length === 0) {
@@ -31,38 +36,37 @@ export default function SeatPage() {
       return;
     }
 
-    // Check login
+    sessionStorage.setItem("selectedBus", JSON.stringify(bus));
+    sessionStorage.setItem(
+      "pendingBooking",
+      JSON.stringify({ busId: id, seats: selected, from: bus.from, to: bus.to, date: bus.date })
+    );
+
     const user = localStorage.getItem("loggedUser");
     if (!user) {
-      // Save seat choice and redirect to login
-      sessionStorage.setItem("pendingBooking", JSON.stringify({ busId: id, seats: selected }));
       router.push("/login?redirect=passenger");
       return;
     }
 
-    // Already logged in → go to passenger details
-    sessionStorage.setItem("pendingBooking", JSON.stringify({ busId: id, seats: selected }));
     router.push("/passenger");
   }
 
-  if (loading) return <><Navbar /><p style={{ padding: 40, color: "var(--muted)" }}>Loading...</p></>;
-  if (!bus)    return <><Navbar /><p style={{ padding: 40, color: "var(--muted)" }}>Bus not found.</p></>;
+  if (loading) return <><Navbar /><p className="page-loading">Loading...</p></>;
+  if (!bus)    return <><Navbar /><p className="page-loading">Bus not found.</p></>;
 
   const total = selected.length * bus.price;
 
   return (
     <>
       <Navbar />
-      <div className="container" style={{ padding: "28px 20px" }}>
+      <div className="container seat-container">
 
-        {/* Heading */}
         <div className="page-title">
           <h2>Select Your Seats</h2>
           <p>{bus.name} · {bus.from} → {bus.to} · {bus.date}</p>
         </div>
 
         <div className="seat-page-grid">
-          {/* Seat map */}
           <div className="card">
             <SeatLayout
               totalSeats={bus.totalSeats}
@@ -73,7 +77,6 @@ export default function SeatPage() {
             />
           </div>
 
-          {/* Booking summary sidebar */}
           <div>
             <div className="card sidebar-card">
               <h3>Booking Summary</h3>
@@ -91,7 +94,7 @@ export default function SeatPage() {
               {selected.length > 0 && (
                 <div className="info-row">
                   <span className="key">Selected</span>
-                  <span className="val" style={{ color: "var(--orange)" }}>
+                  <span className="val selected-seats">
                     {[...selected].sort((a, b) => a - b).join(", ")}
                   </span>
                 </div>
@@ -103,8 +106,7 @@ export default function SeatPage() {
               </div>
 
               <button
-                className="btn btn-primary btn-full"
-                style={{ marginTop: 18 }}
+                className="btn btn-primary btn-full proceed-btn"
                 onClick={handleProceed}
               >
                 Proceed →
@@ -113,6 +115,7 @@ export default function SeatPage() {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 }

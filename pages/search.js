@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 import BusCard from "../components/BusCard";
+import Footer from "@/components/Footer";
+import { fetchApi } from "../utils/api";
 
 const FILTERS = ["All", "AC", "Sleeper", "Seater", "Non-AC"];
 
 function getDateRange(startStr) {
   const dates = [];
   const base = new Date(startStr);
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 7; i++) {
     const d = new Date(base);
     d.setDate(base.getDate() + i);
     dates.push(d.toISOString().split("T")[0]);
@@ -22,30 +24,26 @@ export default function SearchPage() {
 
   const [buses, setBuses]           = useState([]);
   const [filter, setFilter]         = useState("All");
-  const [activeDate, setActiveDate] = useState("");
+  // ✅ Initialize directly from router.query to avoid empty-string first render
+  const [activeDate, setActiveDate] = useState(() => date || "");
   const [loading, setLoading]       = useState(true);
-  const [fetchError, setFetchError] = useState(false);
 
+  // Keep activeDate in sync if URL date param changes
   useEffect(() => {
-    if (date) setActiveDate(date);
+    if (date && activeDate === "") setActiveDate(date);
   }, [date]);
 
   useEffect(() => {
     if (!from || !to || !activeDate) return;
+
     setLoading(true);
-    setFetchError(false);
 
     async function fetchBuses() {
       try {
-        const res = await fetch(
-          `http://localhost:3001/buses?from=${from}&to=${to}&date=${activeDate}`
-        );
-        if (!res.ok) throw new Error("Server error");
-        const data = await res.json();
+        const data = await fetchApi(`/api/buses?from=${from}&to=${to}&date=${activeDate}`);
         setBuses(data);
       } catch (err) {
-        console.error("Fetch failed:", err);
-        setFetchError(true);
+        console.error("Failed to fetch buses:", err);
         setBuses([]);
       } finally {
         setLoading(false);
@@ -59,9 +57,9 @@ export default function SearchPage() {
 
   const dates = getDateRange(date);
 
-  const filtered = buses.filter((b) => {
+  const filtered = buses.filter((bus) => {
     if (filter === "All") return true;
-    return b.type.toLowerCase().includes(filter.toLowerCase());
+    return bus.type.toLowerCase().includes(filter.toLowerCase());
   });
 
   function fmtTab(str) {
@@ -78,7 +76,6 @@ export default function SearchPage() {
       <Navbar />
       <div className="container" style={{ padding: "28px 20px" }}>
 
-        {/* Search summary */}
         <div className="search-summary">
           <strong>{from}</strong>
           <span className="arrow">→</span>
@@ -98,7 +95,6 @@ export default function SearchPage() {
           </button>
         </div>
 
-        {/* Date tabs */}
         <div className="date-tabs">
           {dates.map((d) => {
             const { day, date: dt, month } = fmtTab(d);
@@ -115,7 +111,6 @@ export default function SearchPage() {
           })}
         </div>
 
-        {/* Filter buttons */}
         <div className="filter-row">
           {FILTERS.map((f) => (
             <button
@@ -128,38 +123,26 @@ export default function SearchPage() {
           ))}
         </div>
 
-        {/* json-server not running warning */}
-        {fetchError && (
-          <div className="alert alert-error" style={{ marginBottom: 20 }}>
-            ⚠️ Cannot connect to json-server. Please run:{" "}
-            <code style={{ background: "rgba(0,0,0,0.3)", padding: "2px 6px", borderRadius: 4 }}>
-              json-server --watch data/db.json --port 3001
-            </code>{" "}
-            in a separate terminal.
-          </div>
-        )}
-
-        {/* Bus list */}
         {loading ? (
           <p style={{ color: "var(--muted)", padding: "20px 0" }}>Loading buses...</p>
-        ) : filtered.length === 0 && !fetchError ? (
+        ) : filtered.length === 0 ? (
           <div className="no-buses">
             <h3>No buses found</h3>
             <p>Try a different date or filter.</p>
           </div>
         ) : (
-          !fetchError && (
-            <>
-              <p style={{ color: "var(--muted)", fontSize: "0.86rem", marginBottom: 14 }}>
-                {filtered.length} bus{filtered.length > 1 ? "es" : ""} available
-              </p>
-              {filtered.map((bus) => (
-                <BusCard key={bus.id} bus={bus} />
-              ))}
-            </>
-          )
+          <>
+            <p style={{ color: "var(--muted)", fontSize: "0.86rem", marginBottom: 14 }}>
+              {filtered.length} bus{filtered.length > 1 ? "es" : ""} available
+            </p>
+            {filtered.map((bus) => (
+              <BusCard key={bus.id} bus={bus} from={from} to={to} date={activeDate} />
+            ))}
+          </>
         )}
+
       </div>
+      <Footer/>
     </>
   );
 }
