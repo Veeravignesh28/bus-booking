@@ -1,40 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# 🚌 Bus Ticket Booking System
 
-## Getting Started
+A full-stack Bus Ticket Booking web application built as an MCA Final Year Mini-Project. The system allows users to search for buses, book seats (with specific validations like women-only seats), and includes a secure Admin Dashboard to manage the fleet.
 
-First, run the development server:
+## 🚀 Technologies Used
+- **Frontend:** Next.js (React), standard CSS (Dark Mode UI)
+- **Backend:** Java 17, Spring Boot 3.2.4
+- **Database:** PostgreSQL
+- **Security:** JWT (JSON Web Tokens), Spring Security
+- **Migrations:** Flyway
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
+1. **Dynamic Route Search:** Search for any route and dynamically view available buses. Real-time departure logic prevents booking buses that have already left for the day.
+2. **Interactive Seat Layout:** 
+   - Visual mapping of available vs. booked seats.
+   - Dedicated Pink seats reserved exclusively for female passengers.
+3. **Role-Based Access Control (RBAC):**
+   - **User Role:** Can search buses, book tickets, and view personal booking history.
+   - **Admin Role:** Accesses a secure dashboard to add/delete buses, and view global system bookings and users.
+4. **Automated Database Seeding:** Flyway migrations and a Spring Boot DataInitializer ensure the system is populated with default Admin credentials and dummy routes out-of-the-box.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ How to Run Locally
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+### 1. Backend Setup
+1. Make sure you have **PostgreSQL** installed and running on port `5432`.
+2. Create a database named `bus_booking` (credentials default to `postgres` / `postgres`).
+3. Navigate to the `backend` folder:
+   ```bash
+   cd backend
+   ```
+4. Run the Spring Boot application:
+   ```bash
+   .\mvnw.cmd spring-boot:run
+   ```
+   *The backend will run on `http://localhost:8080` and automatically create all tables.*
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+### 2. Frontend Setup
+1. Open a new terminal and navigate to the project root:
+   ```bash
+   cd "bus ticket booking"
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Next.js development server:
+   ```bash
+   npm run dev
+   ```
+4. Open your browser to `http://localhost:3000`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## 🔐 Default Credentials
+- **Admin Login:** `admin` / `admin`
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+---
+*Developed as an MCA Final Year Mini-Project.*
